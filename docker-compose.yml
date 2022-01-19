@@ -1,0 +1,59 @@
+version: "3.4"
+
+
+services:
+  db:
+    container_name: app__db
+    image: ${IMAGE_DB}
+    build: ./postgres
+
+    volumes: ["db_volume:/var/lib/postgresql/data/"]
+
+    restart: always
+
+  app:
+    container_name: app__app
+    image: ${IMAGE_APP}
+    build: ./src
+
+    env_file: .env
+
+    environment:
+      WAIT_HOSTS: db:5432
+      WAIT_HOSTS_TIMEOUT: 120
+
+    volumes: ["static_volume:/src/static/", "media_volume:/src/media/"]
+    depends_on: ["db"]
+
+    restart: always
+
+  nginx:
+    container_name: app__nginx
+    image: ${IMAGE_NGINX}
+    build: ./nginx
+
+    volumes:
+      - "static_volume:/src/static/"
+      - "nginx_log_volume:/var/log/nginx/"
+      - "media_volume:/src/media/"
+
+    ports:
+      - ${PORT}:80
+
+    restart: always
+
+  nginx-exporter:
+    container_name: app__nginx-exporter
+    image: ${IMAGE_NGINX_EXPORTER}
+    build: ./nginx-exporter
+
+    volumes: ["nginx_log_volume:/var/log/nginx/"]
+
+    restart: always
+
+
+volumes:
+  db_volume:
+  nginx_log_volume:
+  static_volume:
+  media_volume:
