@@ -1,0 +1,8 @@
+{
+    "API_SECRET_KEY": "XXXXXXX",
+    "method": "POST",
+    "canonical_url": "/.../.../...",
+    "query_params": {},
+    "headers": {},
+    "with_x_datetime": true
+}
